@@ -48,7 +48,7 @@ const EditAnnouncement = () => {
   return (
     <div>
       <div className="breadcrumb">
-        <Link to="/announcements">ADMIN > 공지사항</Link> <span>></span> 공지사항 수정
+        <Link to="/announcements">ADMIN &gt; 공지사항</Link> <span>&gt;</span> 공지사항 수정
       </div>
       <h1 className="page-title">공지사항 수정</h1> {/* 이미지에서는 "사용자 수정"이지만 문맥상 "공지사항 수정" */}
       

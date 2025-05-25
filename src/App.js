@@ -1,5 +1,5 @@
 // src/App.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // useEffect 추가
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
 
@@ -13,20 +13,43 @@ import CreateAnnouncement from './pages/CreateAnnouncement';
 import EditAnnouncement from './pages/EditAnnouncement';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // 초기값 false
+  // localStorage에서 토큰을 확인하여 초기 로그인 상태 설정
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('accessToken'));
 
   // ProtectedRoute 컴포넌트
   const ProtectedRoute = ({ children }) => {
-    if (!isLoggedIn) {
+    // isLoggedIn 상태가 false이고, localStorage에도 토큰이 없다면 로그인 페이지로 강제 이동
+    // (앱 로드 시 localStorage 체크로 isLoggedIn이 이미 true일 수 있음)
+    if (!isLoggedIn && !localStorage.getItem('accessToken')) {
       return <Navigate to="/login" replace />;
     }
     return children;
   };
 
+  // 이 useEffect는 선택 사항입니다.
+  // 로그인 상태가 외부 요인(예: 다른 탭에서의 로그아웃)으로 변경될 때 동기화하거나,
+  // 토큰 유효성 검사 등을 수행할 수 있습니다.
+  // 현재 로직에서는 로그인/로그아웃 시 명시적으로 localStorage를 관리하므로,
+  // 이 useEffect가 없어도 기본적인 동작은 가능합니다.
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsLoggedIn(!!localStorage.getItem('accessToken'));
+    };
+
+    window.addEventListener('storage', handleStorageChange); // 다른 탭/창에서의 localStorage 변경 감지
+
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+
   return (
     <Router>
       <Routes>
         <Route path="/login" element={
+          // 이미 로그인 상태(isLoggedIn이 true)면 대시보드로 리디렉션
           isLoggedIn ? <Navigate to="/" replace /> : <LoginPage setIsLoggedIn={setIsLoggedIn} />
         } />
         

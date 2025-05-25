@@ -10,7 +10,9 @@ const Layout = ({ setIsLoggedIn }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
+    localStorage.removeItem('accessToken'); // 저장된 토큰 삭제
     setIsLoggedIn(false);
+    setIsLogoutModalOpen(false); // 모달 닫기
     navigate('/login');
   };
 
