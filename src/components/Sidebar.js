@@ -1,0 +1,41 @@
+// src/components/Sidebar.js
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+
+const Sidebar = () => {
+  const [managementOpen, setManagementOpen] = useState(true);
+  const [noticesOpen, setNoticesOpen] = useState(true);
+
+  return (
+    <nav className="sidebar">
+      <div className="sidebar-header">Administrator</div>
+      <div className="sidebar-menu-title">ADMIN</div>
+      <ul>
+        <li>
+          <a href="#!" onClick={() => setManagementOpen(!managementOpen)}>
+            관리 {managementOpen ? '▼' : '▶'}
+          </a>
+          {managementOpen && (
+            <ul className="submenu">
+              <li><NavLink to="/members">회원조회</NavLink></li>
+              {/* <li><NavLink to="/users/manage">사용자 수정</NavLink></li> 편의상 MemberList와 동일하게 연결 */}
+            </ul>
+          )}
+        </li>
+        <li>
+          <a href="#!" onClick={() => setNoticesOpen(!noticesOpen)}>
+            공지사항 {noticesOpen ? '▼' : '▶'}
+          </a>
+          {noticesOpen && (
+            <ul className="submenu">
+              <li><NavLink to="/announcements">게시글 목록</NavLink></li>
+              {/* <li><NavLink to="/announcements/manage">공지사항 수정</NavLink></li> 편의상 AnnouncementList와 동일하게 연결 */}
+            </ul>
+          )}
+        </li>
+      </ul>
+    </nav>
+  );
+};
+
+export default Sidebar;
