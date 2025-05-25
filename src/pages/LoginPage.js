@@ -13,9 +13,6 @@ const LoginPage = ({ setIsLoggedIn }) => {
     setError(''); // 이전 오류 메시지 초기화
 
     try {
-      // 백엔드 API 엔드포인트 (프록시 설정된 경우 상대 경로, 아니면 전체 URL)
-      // 예: const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-      // const response = await fetch(`${apiUrl}/api/admin/auth/login`, {
       const response = await fetch('http://ceprj.gachon.ac.kr:60021/api/admin/auth/login', {
         method: 'POST',
         headers: {

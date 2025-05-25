@@ -12,18 +12,21 @@ const Sidebar = () => {
       <div className="sidebar-menu-title">ADMIN</div>
       <ul>
         <li>
-          <a href="#!" onClick={() => setManagementOpen(!managementOpen)}>
+          <a href="#!" onClick={() => setManagementOpen(!managementOpen)} aria-expanded={managementOpen}>
             관리 {managementOpen ? '▼' : '▶'}
           </a>
           {managementOpen && (
             <ul className="submenu">
               <li><NavLink to="/members">회원조회</NavLink></li>
+              {/* "사용자 조회" 링크 추가 - 현재는 회원조회와 동일한 /members 로 연결합니다. 
+                  필요에 따라 별도의 사용자 검색/조회 페이지(/user-search 등)로 변경할 수 있습니다. */}
+              <li><NavLink to="/members">사용자 조회</NavLink></li>
               {/* <li><NavLink to="/users/manage">사용자 수정</NavLink></li> 편의상 MemberList와 동일하게 연결 */}
             </ul>
           )}
         </li>
         <li>
-          <a href="#!" onClick={() => setNoticesOpen(!noticesOpen)}>
+          <a href="#!" onClick={() => setNoticesOpen(!noticesOpen)} aria-expanded={noticesOpen}>
             공지사항 {noticesOpen ? '▼' : '▶'}
           </a>
           {noticesOpen && (
