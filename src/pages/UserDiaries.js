@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+import axios from 'axios';
 
 // 간단한 모달 스타일 (실제 프로젝트에서는 CSS 파일로 분리하는 것이 좋습니다)
 const modalStyles = {
@@ -120,30 +121,39 @@ const UserDiaries = () => {
   };
 
   const handleViewDiary = async (diaryId) => {
-  setIsModalOpen(true);
-  setModalLoading(true); // API 호출이 없으므로 로딩은 짧게
-  setModalError('');
-  setSelectedDiaryDetail(null);
+    setIsModalOpen(true);
+    setModalLoading(true);
+    setModalError('');
+    setSelectedDiaryDetail(null);
 
-  // 현재 diaries 목록에서 해당 diaryId의 정보를 찾습니다.
-  const diaryFromList = diaries.find(d => d.diaryId === diaryId);
+    try {
+      // 요청하신 URL로 직접 axios 호출
+      const token = localStorage.getItem('accessToken'); // 토큰 가져오기
+      const response = await axios.get(
+        `http://ceprj.gachon.ac.kr:60021/api/diaries/${diaryId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}` // 인증 헤더 추가
+          }
+        }
+      );
 
-  if (diaryFromList) {
-    // API 호출 없이, 목록에서 가져온 기본 정보만으로 모달을 채웁니다.
-    // title과 content는 없으므로, 해당 필드는 비어있거나 기본값으로 표시됩니다.
-    setSelectedDiaryDetail({
-      diaryId: diaryFromList.diaryId,
-      writtenDate: diaryFromList.writtenDate,
-      emotionType: diaryFromList.emotionType,
-      title: `일기 (ID: ${diaryFromList.diaryId})`, // 임시 제목
-      content: "상세 내용을 보려면 백엔드 API 구현이 필요합니다." // 임시 내용
-    });
-    setModalLoading(false);
-  } else {
-    setModalError(`일기 (ID: ${diaryId}) 정보를 목록에서 찾을 수 없습니다.`);
-    setModalLoading(false);
-  }
-};
+      setSelectedDiaryDetail({
+          diaryId: response.data.diaryId,
+          memberId: response.data.memberId,
+          originalContent: response.data.content,         // API 응답의 'content'를 'originalContent'로 매핑
+          transformedContent: response.data.transformContent, // API 응답의 'transformContent'를 'transformedContent'로 매핑
+          writtenDate: response.data.writtenDate,
+          emotionId: response.data.emotionId,             // API 응답의 'emotionId'를 'emotionId'로 매핑
+        });
+    } catch (err) {
+      console.error('일기 상세 정보 조회 실패:', err);
+      setModalError(`일기 내용을 불러오는데 실패했습니다: ${err.response?.data?.message || err.message}`);
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -239,22 +249,43 @@ const UserDiaries = () => {
       )}
 
       {isModalOpen && (
-        <div style={modalStyles.overlay} onClick={closeModal}> {/* 오버레이 클릭 시 닫기 */}
-          <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}> {/* 모달 컨텐츠 클릭은 전파 방지 */}
+        <div style={modalStyles.overlay} onClick={closeModal}>
+          <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
             <button style={modalStyles.closeButton} onClick={closeModal}>×</button>
             {modalLoading && <p>일기 내용을 불러오는 중...</p>}
             {modalError && <p style={{ color: 'red' }}>{modalError}</p>}
             {selectedDiaryDetail && !modalLoading && !modalError && (
               <>
                 <h2 style={modalStyles.diaryTitle}>
-                  {selectedDiaryDetail.title || `일기 (ID: ${selectedDiaryDetail.diaryId})`}
+                  일기 (ID: {selectedDiaryDetail.diaryId})
                 </h2>
                 <p><strong>작성일:</strong> {selectedDiaryDetail.writtenDate}</p>
-                <p><strong>감정:</strong> {selectedDiaryDetail.emotionType}</p>
-                <div style={modalStyles.diaryContent}>
-                  <strong>내용:</strong>
-                  <p>{selectedDiaryDetail.content || "내용이 없습니다."}</p>
+                
+                {/* 감정 표시 (임시로 ID 표시, 실제로는 문자열 변환 필요) */}
+                <p><strong>감정 ID:</strong> {selectedDiaryDetail.emotionId !== undefined ? selectedDiaryDetail.emotionId : '정보 없음'}</p>
+                {/* 
+                  만약 emotionId를 문자열로 변환하는 함수가 있다면:
+                  <p><strong>감정:</strong> {mapEmotionIdToString(selectedDiaryDetail.emotionId) || '정보 없음'}</p> 
+                */}
+
+                {/* 원본 내용 표시 */}
+                <div style={{ marginTop: '15px' }}>
+                  <h3 style={{ fontSize: '1.1em', color: '#333', borderBottom: '1px solid #eee', paddingBottom: '5px', marginBottom: '5px' }}>내용</h3>
+                  <div style={modalStyles.diaryContent}>
+                    {/* selectedDiaryDetail.originalContent가 존재하고 비어있지 않은지 확인 */}
+                    <p>{selectedDiaryDetail.originalContent ? selectedDiaryDetail.originalContent : "내용이 없습니다."}</p>
+                  </div>
                 </div>
+
+                {/* 변환된 내용 표시 (선택 사항) */}
+                {selectedDiaryDetail.transformedContent && (
+                  <div style={{ marginTop: '20px' }}>
+                    <h3 style={{ fontSize: '1.1em', color: '#333', borderBottom: '1px solid #eee', paddingBottom: '5px', marginBottom: '5px' }}>변환된 내용</h3>
+                    <div style={modalStyles.diaryContent}>
+                      <p>{selectedDiaryDetail.transformedContent}</p>
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
