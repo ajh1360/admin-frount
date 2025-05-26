@@ -39,26 +39,16 @@ const MemberList = () => {
       return;
     }
 
-    // API가 요구하는 전체 필드를 보내야 할 수 있습니다.
-    // 여기서는 name, role, birthDate, phone과 함께 active 상태를 전송합니다.
-    // 백엔드 API 명세에 따라 payload를 조정해야 합니다.
-    // 만약 비밀번호 필드가 필수라면, 해당 로직도 추가 고려가 필요합니다 (보통 상태 변경 시 비밀번호는 제외).
     const payload = {
       name: memberToUpdate.name,
       email: memberToUpdate.email, // API에 따라 email은 변경 불가일 수 있음
       role: memberToUpdate.role,
       birthDate: memberToUpdate.birthDate,
       phone: memberToUpdate.phone,
-      active: newStatus, // 변경된 활성화 상태
     };
 
     try {
-      // 관리자 API 경로를 사용합니다 (axiosInstance의 baseURL이 /api/admin으로 설정됨).
-      // API 명세에는 POST /api/admin/members/{memberId}로 되어있으나, PUT이 더 적합합니다.
-      // 실제 엔드포인트 및 HTTP 메소드는 백엔드와 협의하여 결정해야 합니다.
       await axiosInstance.put(`/members/${memberId}`, payload);
-      
-      // 성공 시 로컬 상태 업데이트 (또는 목록을 다시 불러올 수 있음 fetchMembers())
       setMembers(prevMembers =>
         prevMembers.map(member =>
           member.memberId === memberId ? { ...member, active: newStatus } : member
@@ -83,7 +73,6 @@ const MemberList = () => {
           <tr>  
             <th>아이디 (이메일)</th>
             <th>이름</th>
-            <th>계정 상태</th>
             <th>사용자 수정</th>
           </tr>
         </thead>
@@ -93,32 +82,6 @@ const MemberList = () => {
             <tr key={member.memberId}>
               <td>{member.email}</td>
               <td>{member.name}</td>
-              <td>
-                {/* 
-                  member.active 필드가 API 응답에 반드시 포함되어야 합니다.
-                  이 필드가 undefined이면 버튼 로직이 제대로 동작하지 않습니다.
-                */}
-                {typeof member.active === 'boolean' ? (
-                  <>
-                    <button 
-                      onClick={() => handleUpdateStatus(member.memberId, true)} 
-                      disabled={member.active === true}
-                      style={{ marginRight: '5px', padding: '5px 10px', cursor: 'pointer', backgroundColor: member.active === true ? '#ccc' : 'royalblue', color: 'white', border: 'none', borderRadius: '4px' }}
-                    >
-                      활성화
-                    </button>
-                    <button 
-                      onClick={() => handleUpdateStatus(member.memberId, false)} 
-                      disabled={member.active === false}
-                      style={{ padding: '5px 10px', cursor: 'pointer', backgroundColor: member.active === false ? '#ccc' : 'tomato', color: 'white', border: 'none', borderRadius: '4px' }}
-                    >
-                      비활성화
-                    </button>
-                  </>
-                ) : (
-                  <span>상태 정보 없음</span> // member.active가 없는 경우
-                )}
-              </td>
               <td>
                 <Link to={`/members/edit/${member.memberId}`}>✏️</Link>
               </td>

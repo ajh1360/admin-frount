@@ -53,9 +53,9 @@ const CreateAnnouncement = () => {
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      // 성공적으로 생성된 공지사항 객체를 반환받을 수 있습니다. (선택적)
-      // const newAnnouncement = await response.json();
-      // console.log('새 공지 생성 성공:', newAnnouncement);
+    
+      const newAnnouncement = await response.json();
+      console.log('새 공지 생성 성공:', newAnnouncement);
 
       alert('공지사항이 작성되었습니다.');
       navigate('/announcements'); // 공지사항 목록으로 이동
