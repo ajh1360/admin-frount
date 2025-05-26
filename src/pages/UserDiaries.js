@@ -262,7 +262,9 @@ const UserDiaries = () => {
       )}
 
        <div className="form-actions" style={{ marginTop: '20px' }}>
-        <button className="btn-gray" onClick={() => navigate(`/users/${userId}`)}>사용자 정보로 돌아가기</button>
+        <button className="btn-gray" onClick={() => navigate(`/members/edit/${userId}`)}>
+          사용자 정보로 돌아가기
+        </button>
       </div>
     </div>
   );

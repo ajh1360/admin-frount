@@ -28,7 +28,6 @@ const Sidebar = () => {
           {noticesOpen && (
             <ul className="submenu">
               <li><NavLink to="/announcements">게시글 목록</NavLink></li>
-              <li><NavLink to="/announcements/manage">공지사항 수정</NavLink></li>  
             </ul>
           )}
         </li>
