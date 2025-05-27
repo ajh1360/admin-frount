@@ -21,9 +21,6 @@ const MemberList = () => {
       if (response.data && response.data.members) {
         setMembers(response.data.members || []);
         setTotalPages(response.data.totalPages || 0);
-        // API 응답의 currentPage를 사용하여 동기화 할 수도 있으나,
-        // UI에서 관리하는 currentPage를 기준으로 데이터를 요청하므로 필수적이진 않음.
-        // setCurrentPage(response.data.currentPage);
       } else {
         setMembers([]);
         setTotalPages(0);
@@ -35,14 +32,11 @@ const MemberList = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // ITEMS_PER_PAGE는 상수이므로 의존성 배열에 추가하지 않아도 됩니다.
+  }, []); 
 
   useEffect(() => {
     fetchMembers(currentPage);
   }, [currentPage, fetchMembers]);
-
-  // handleUpdateStatus 함수는 현재 API 명세에 '회원 상태(active/inactive)' 변경 기능이 없으므로 제거합니다.
-  // 회원 정보 수정은 '/members/edit/:memberId' 경로의 페이지에서 PUT 요청을 통해 처리될 것입니다.
 
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < totalPages && newPage !== currentPage) {
@@ -80,7 +74,7 @@ const MemberList = () => {
           className={`pagination-button ${i === currentPage ? 'active' : ''}`}
           disabled={loading}
         >
-          {i + 1} {/* 사용자에게는 1부터 시작하는 페이지 번호로 표시 */}
+          {i + 1} 
         </button>
       );
     }
@@ -134,7 +128,7 @@ const MemberList = () => {
           <tr>
             <th>아이디 (이메일)</th>
             <th>이름</th>
-            <th>사용자 수정</th> {/* API 명세에 따라 '상태 변경' 대신 '사용자 수정'만 남깁니다. */}
+            <th>사용자 수정</th> 
           </tr>
         </thead>
         <tbody>
@@ -150,7 +144,6 @@ const MemberList = () => {
             ))
             ) : (
               <tr>
-                {/* 초기 로딩 시에는 "로딩 중..." 메시지가 표시되므로, 여기는 데이터가 없는 경우만 해당 */}
                 <td colSpan="3" style={{ textAlign: 'center' }}>
                   {loading ? "데이터를 불러오는 중입니다..." : "회원 정보가 없습니다."}
                 </td>
@@ -160,7 +153,7 @@ const MemberList = () => {
       </table>
       {renderPagination()}
 
-      {/* 페이지네이션 버튼 스타일 (기존 코드와 동일하게 유지 또는 프로젝트 CSS에 맞게 수정) */}
+  
       <style jsx>{`
       .pagination-controls {
           display: flex;
