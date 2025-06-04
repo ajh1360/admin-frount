@@ -12,6 +12,9 @@ const Sidebar = () => {
       <div className="sidebar-menu-title">ADMIN</div>
       <ul>
         <li>
+          <NavLink to="/dashboard">관리자 페이지</NavLink>
+        </li>
+        <li>
           <a href="#!" onClick={() => setManagementOpen(!managementOpen)} aria-expanded={managementOpen}>
             관리 {managementOpen ? '▼' : '▶'}
           </a>
