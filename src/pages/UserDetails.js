@@ -16,24 +16,21 @@ const UserDetails = () => {
  
   useEffect(() => {
     const fetchUser = async () => {
-      // userId가 없거나, 문자열 "undefined"일 경우 API 호출 방지
       if (!userId || userId === "undefined") {
         console.warn('유효하지 않은 userId:', userId);
-        // 선택적으로 사용자를 목록으로 리디렉션하거나 오류 메시지 표시
-        navigate('/members'); // 목록으로 이동 또는 오류 페이지
+        navigate('/members');
         return;
       }
       try {
-        const response = await axiosInstance.get(`/members/${userId}`); // API: /api/admin/members/{memberId}
+        const response = await axiosInstance.get(`/members/${userId}`);
         setUser(response.data);
         setName(response.data.name);
-        // Ensure birthDate is in 'YYYY-MM-DD' format for <input type="date">
         setBirthDate(response.data.birthDate ? response.data.birthDate.split('T')[0] : '');
         setPhone(response.data.phone || '');
-        setPassword(''); // 보안을 위해 빈 값
+        setPassword('');
       } catch (err) {
         console.error('사용자 정보 조회 실패:', err);
-        navigate('/members'); // 오류 발생 시 목록으로 이동
+        navigate('/members');
       }
     };
     fetchUser();
@@ -41,17 +38,14 @@ const UserDetails = () => {
 
   const handleUpdate = async () => {
     try {
-      // 비밀번호가 비어있으면 payload에서 제외하거나, 서버에서 비어있는 경우 무시하도록 처리 필요
-      // 여기서는 비밀번호가 비어있으면 null 또는 undefined로 보내지 않도록 조건부 추가
       const payload = {
         name,
         birthDate,
         phone,
       };
-      if (password) { // 비밀번호가 입력된 경우에만 payload에 포함
+      if (password) {
         payload.password = password;
       }
-
 
       await axiosInstance.put(`/members/${userId}`, payload);
       alert('회원 정보가 수정되었습니다.');
@@ -92,11 +86,10 @@ const UserDetails = () => {
         <input type="text" value={phone} onChange={(e) => setPhone(e.target.value)} />
       </div>
 
-      {/* 사용자 일기 보기 버튼 추가 */}
       <div className="form-group" style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
         <label>사용자 활동</label>
         <button 
-            className="btn-green" // Use an appropriate class or style
+            className="btn-green"
             onClick={() => navigate(`/users/${userId}/diaries`)}
             style={{ backgroundColor: '#28a745', color: 'white', padding: '10px 15px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
         >
@@ -104,11 +97,42 @@ const UserDetails = () => {
         </button>
       </div>
 
-
       <div className="form-actions" style={{ marginTop: '30px' }}>
         <button className="btn-blue" onClick={handleUpdate}>수정하기</button>
         <button className="btn-gray" onClick={() => navigate('/members')}>목록으로</button>
       </div>
+
+      {/* === CSS 스타일 추가 === */}
+      <style jsx>{`
+        .form-group {
+          margin-bottom: 15px; /* 각 폼 그룹 간의 간격 */
+        }
+        .form-group label {
+          display: block; /* 레이블을 블록 요소로 만들어 줄 바꿈 */
+          margin-bottom: 5px; /* 레이블과 입력 필드 사이 간격 */
+          font-weight: bold;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="password"],
+        .form-group input[type="date"] {
+          width: 100%; /* 입력 필드 너비를 100%로 설정 */
+          padding: 10px; /* 내부 여백 */
+          border: 1px solid #ccc; /* 테두리 */
+          border-radius: 4px; /* 테두리 둥글게 */
+          box-sizing: border-box; /* padding과 border가 width에 포함되도록 설정 */
+          font-size: 1rem; /* 폰트 크기 일관성 */
+        }
+        .form-group input[readonly] {
+          background-color: #e9ecef; /* 읽기 전용 필드 배경색 */
+          cursor: not-allowed; /* 읽기 전용 커서 모양 */
+        }
+        .form-actions button {
+          margin-right: 10px; /* 버튼 사이 간격 */
+        }
+        /* 기존에 App.css 등에 .btn-green, .btn-blue, .btn-gray 스타일이 정의되어 있다고 가정합니다. */
+        /* 없다면 여기에 추가적인 버튼 스타일을 정의할 수 있습니다. */
+      `}</style>
+      {/* ===================== */}
     </div>
   );
 };
