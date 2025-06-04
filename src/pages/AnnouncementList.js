@@ -18,7 +18,6 @@ const AnnouncementList = () => {
     if (!token) {
       console.error("Access token not found. User might not be logged in.");
       setError("인증 토큰이 없습니다. 다시 로그인해주세요.");
-      // navigate('/login'); // 필요시 로그인 페이지로 리다이렉트
       return null;
     }
     return {
@@ -37,8 +36,6 @@ const AnnouncementList = () => {
     }
 
     try {
-      // API URL에 page와 size 파라미터 추가
-      // 서버 API가 페이지네이션을 지원하고, page(0부터 시작), size 파라미터를 받는다고 가정합니다.
       const response = await fetch(`http://ceprj.gachon.ac.kr:60021/api/admin/notices?page=${page}&size=${ITEMS_PER_PAGE}`, {
         headers: headers,
       });
@@ -56,11 +53,7 @@ const AnnouncementList = () => {
       }
 
       const data = await response.json();
-      // 서버 응답 DTO에 따라 공지사항 목록과 전체 페이지 수를 가져옵니다.
-      // 예시: Spring Pageable의 경우 data.content, data.totalPages
-      // 여기서는 data.notices (목록)와 data.totalPages (전체 페이지 수)로 가정합니다.
-      // 실제 API 응답 구조에 맞게 수정해주세요.
-      const noticeList = data.notices || data.content; // 서버 응답에 따라 'notices' 또는 'content' 사용
+      const noticeList = data.notices || data.content;
       const totalPagesCount = data.totalPages;
 
       if (noticeList) {
@@ -86,11 +79,11 @@ const AnnouncementList = () => {
     } finally {
       setLoading(false);
     }
-  }, [getAuthHeaders]); // ITEMS_PER_PAGE는 상수이므로 의존성 배열에 추가 불필요
+  }, [getAuthHeaders]);
 
   useEffect(() => {
     fetchAnnouncements(currentPage);
-  }, [fetchAnnouncements, currentPage]); // currentPage 변경 시 데이터 다시 로드
+  }, [fetchAnnouncements, currentPage]);
 
   const toggleStatus = async (announcementId) => {
     const announcement = announcements.find(ann => ann.id === announcementId);
@@ -123,8 +116,6 @@ const AnnouncementList = () => {
         body: JSON.stringify({
           title: announcement.title,
           content: announcement.content || "내용 없음",
-          // writer: announcement.writer, // 서버에서 자동 설정
-          // status: newStatus // 서버 DTO에 status 필드가 있다면 보내야 함
         }),
       });
 
@@ -142,9 +133,6 @@ const AnnouncementList = () => {
         alert(`공지사항 상태 변경에 실패했습니다 (ID: ${announcementId}).`);
         return;
       }
-      // 상태 변경 성공 후, 현재 페이지를 다시 로드하여 최신 상태를 반영할 수 있습니다.
-      // 또는 서버 응답에 업데이트된 공지사항이 있다면 그것으로 대체할 수도 있습니다.
-      // 여기서는 낙관적 업데이트를 유지하고, 필요시 아래 주석 해제
       // fetchAnnouncements(currentPage); 
     } catch (e) {
       console.error("Failed to toggle status:", e);
@@ -163,7 +151,6 @@ const AnnouncementList = () => {
   const handlePageChange = (newPage) => {
     if (newPage >= 0 && newPage < totalPages && newPage !== currentPage) {
       setCurrentPage(newPage);
-      // fetchAnnouncements는 useEffect에 의해 currentPage 변경 시 자동으로 호출됨
     }
   };
 
@@ -237,7 +224,7 @@ const AnnouncementList = () => {
   };
 
 
-  if (loading && announcements.length === 0) { // 초기 로딩 중일 때
+  if (loading && announcements.length === 0) {
     return (
       <div>
         <div className="breadcrumb">ADMIN {'>'} 공지사항</div>
@@ -277,7 +264,6 @@ const AnnouncementList = () => {
             <tr>
               <th>게시글 ID</th>
               <th>제목</th>
-              <th>작성자</th>
               <th>공지 상태</th>
               <th>수정</th>
             </tr>
@@ -287,7 +273,6 @@ const AnnouncementList = () => {
               <tr key={ann.id}>
                 <td>{ann.id}</td>
                 <td>{ann.title}</td>
-                <td>{ann.writer}</td>
                 <td>
                   <button
                     className={`status-button ${ann.status === '활성화' ? 'btn-blue' : 'btn-red'}`}
@@ -305,9 +290,8 @@ const AnnouncementList = () => {
           </tbody>
         </table>
       )}
-      {totalPages > 0 && renderPagination()} {/* 공지사항이 있을 때만 페이지네이션 표시 */}
+      {totalPages > 0 && renderPagination()}
 
-      {/* 페이지네이션 CSS (MemberList.js와 동일) */}
       <style jsx>{`
       .pagination-controls {
           display: flex;
